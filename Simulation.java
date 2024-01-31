@@ -1,4 +1,5 @@
-
+import java.util.ArrayList;
+import java.util.Collections;
 /**
  * Write a description of class Simulation here.
  * 
@@ -8,45 +9,59 @@
 public class Simulation {
 
     final static boolean DEBUGGING = false;
-    Player p1 = new TitForTat( );
-    Player p2 = new Player ( );
+    ArrayList<Player> players = new ArrayList<Player>();
+    Player p1 = new Player( );
+    Player p2 = new Player( );
     
     public Simulation ( ) {
         this (200);
     }
     
     public Simulation (int gameCount) {
+        players.add(new Player());
+        players.add(new Competitor());
+        players.add(new RandomChooser());
+        players.add(new TitForTat());
+        players.add(new Unforgiving());
 
-        for (int k=0; k<gameCount; k++) {
-            boolean p1cooperated = p1.cooperates ( );
-            boolean p2cooperated = p2.cooperates ( );
-            if (p1cooperated) {
-                if (p2cooperated) {
-                    p1.increaseScore (3);
-                    p2.increaseScore (3);
+        for(int x = 0; x < 500; x++){
+            p1 = players.get((int)(Math.random() * players.size()));
+            p2 = players.get((int)(Math.random() * players.size()));
+
+            for (int k=0; k<gameCount; k++) {
+                boolean p1cooperated = p1.cooperates ( );
+                boolean p2cooperated = p2.cooperates ( );
+                if (p1cooperated) {
+                    if (p2cooperated) {
+                        p1.increaseScore (3);
+                        p2.increaseScore (3);
+                    } else {
+                        p1.increaseScore (0);
+                        p2.increaseScore (5);
+                    }
                 } else {
-                    p1.increaseScore (0);
-                    p2.increaseScore (5);
+                    if (p2cooperated) {
+                        p1.increaseScore (5);
+                        p2.increaseScore (0);
+                    } else {
+                        p1.increaseScore (1) ;
+                        p2.increaseScore (1);
+                    }
                 }
-            } else {
-                if (p2cooperated) {
-                    p1.increaseScore (5);
-                    p2.increaseScore (0);
-                } else {
-                    p1.increaseScore (1) ;
-                    p2.increaseScore (1);
+                if (DEBUGGING) {
+                    // System.out.println ("p1 " + p1cooperated + ", p2 " + p2cooperated);
+                    // System.out.println ("p1 score = " + p1.score ( ) + ", p2 score = " + p2.score ( ));
                 }
+        
+                p1.remember (p2cooperated);
+                p2.remember (p1cooperated);
             }
-            if (DEBUGGING) {
-                System.out.println ("p1 " + p1cooperated + ", p2 " + p2cooperated);
-                System.out.println ("p1 score = " + p1.score ( ) + ", p2 score = " + p2.score ( ));
-            }
-    
-            p1.remember (p2cooperated);
-            p2.remember (p1cooperated);
         }
-        System.out.println ("Player 1 has " + p1.score ( ));
-        System.out.println ("Player 2 has " + p2.score ( ));
+        
+        Collections.sort(players);
+        for(Player p : players){
+            System.out.println(p);
+        }
     }
     
 
